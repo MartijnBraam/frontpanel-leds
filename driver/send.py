@@ -14,6 +14,7 @@ def write_packet(packet):
 
 
 def write_frame(frame):
+    frame = reversed(frame)
     flat_frame = [item for sublist in frame for item in sublist]
     write_packet(flat_frame)
 
@@ -70,7 +71,7 @@ while False:
     write_packet([4])
 
 i = 0
-while False:
+while True:
     i += 30
     sleep(0.1)
     pos = math.sin(math.radians(i))
