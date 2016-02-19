@@ -11,7 +11,6 @@ netmax = 10 * 1024
 
 
 def write_packet(packet):
-    print(packet)
     data = cobs.encode(bytearray(packet))
     ser.write(data + b"\0")
 
