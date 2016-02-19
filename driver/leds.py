@@ -5,6 +5,8 @@ from time import sleep
 import psutil
 import argparse
 
+interval = 0.5
+
 
 def write_packet(packet):
     data = cobs.encode(bytearray(packet))
@@ -109,14 +111,14 @@ def mode_demo():
 
 def mode_graph_cpu():
     while True:
-        sleep(0.5)
+        sleep(interval)
         cpu = psutil.cpu_percent()
         render_graph_point(cpu, 0, 100)
 
 
 def mode_graph_memory():
     while True:
-        sleep(0.5)
+        sleep(interval)
         mem = psutil.virtual_memory().percent
         render_graph_point(mem, 0, 100)
 
@@ -133,7 +135,7 @@ def main(device, mode, hflip=False, vflip=False):
         mode_bars()
     elif mode == 'graph-cpu':
         mode_graph_cpu()
-    elif mode == 'graph-mem':
+    elif mode == 'graph-memory':
         mode_graph_memory()
 
 
@@ -141,7 +143,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Frontpanel led controller")
     parser.add_argument('--hflip', help="Flip the display output on the horisontal axis", action="store_true")
     parser.add_argument('--vflip', help="Flip the display output on the vertical axis", action="store_true")
+    parser.add_argument('--interval', '-i', help="Update interval for chart modes in seconds", type=float, default=0.5)
     parser.add_argument('device', help="Path to the serial port", default="/dev/frontpanel")
     parser.add_argument('mode', help="Chooses what to display", choices=['bars', 'graph-cpu', 'graph-memory', 'demo'])
     args = parser.parse_args()
+    interval = args.interval
     main(args.device, args.mode, args.hflip, args.vflip)
