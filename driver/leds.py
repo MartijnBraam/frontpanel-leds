@@ -129,17 +129,25 @@ def mode_graph_memory():
 
 def mode_clock():
     while True:
-        sleep(1)
+        sleep(0.1)
         now = datetime.datetime.now()
-        seconds = now.second % 2
+        seconds = (now.second % 2) * 10
+
+        hour5 = int(math.floor(now.hour / 5))
+
+        bar_hour5_1 = int(hour5 > 0)
+        bar_hour5_2 = int(hour5 > 1)
+        bar_hour5_3 = int(hour5 > 2)
+        bar_hour5_4 = int(hour5 > 3)
+
         frame = [
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, seconds],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
+            [seconds, bar_hour5_4, 0, 0, 0],
+            [0, bar_hour5_3, 0, 0, 0, 0],
+            [0, bar_hour5_2, 0, 0, 0, 0],
+            [0, bar_hour5_1, 0, 0, 0, 0],
         ]
         write_frame(frame)
 
@@ -171,7 +179,8 @@ if __name__ == "__main__":
                         help="The scaling for network usage. Defines the maximum value in KB/s (default 10 MB/s)",
                         default=10 * 1024, type=int)
     parser.add_argument('device', help="Path to the serial port", default="/dev/frontpanel")
-    parser.add_argument('mode', help="Chooses what to display", choices=['bars', 'graph-cpu', 'graph-memory', 'demo', 'clock'])
+    parser.add_argument('mode', help="Chooses what to display",
+                        choices=['bars', 'graph-cpu', 'graph-memory', 'demo', 'clock'])
     args = parser.parse_args()
     interval = args.interval
     netmax = args.netmax
