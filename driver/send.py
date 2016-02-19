@@ -95,7 +95,7 @@ def mode_demo():
 
 
 def mode_graph():
-    while False:
+    while True:
         sleep(0.3)
 
         cpu = psutil.cpu_percent() / 100.0
