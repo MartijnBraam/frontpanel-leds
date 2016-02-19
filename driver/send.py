@@ -65,26 +65,6 @@ def render_bar(frame, col, value):
     return frame
 
 
-while False:
-    sleep(0.3)
-
-    cpu = psutil.cpu_percent() / 100.0
-
-    val = int((cpu * 6) + 0.5)
-    if val > 5:
-        val = 5
-
-    val = 5 - val
-
-    row = [0] * 6
-
-    for j in range(val, 6):
-        row[j] = 10
-    row[val] = 1
-
-    write_packet(row)
-
-
 def mode_bars():
     while True:
         cpu = psutil.cpu_percent() / 100.0
@@ -114,6 +94,27 @@ def mode_demo():
         write_column(row)
 
 
+def mode_graph():
+    while False:
+        sleep(0.3)
+
+        cpu = psutil.cpu_percent() / 100.0
+
+        val = int((cpu * 6) + 0.5)
+        if val > 5:
+            val = 5
+
+        val = 5 - val
+
+        row = [0] * 6
+
+        for j in range(val, 6):
+            row[j] = 10
+        row[val] = 1
+
+        write_column(row)
+
+
 def main(device, mode, hflip=False, vflip=False):
     global ser, flip_horisontal, flip_vertical
     ser = serial.Serial(device, 115200)
@@ -124,6 +125,8 @@ def main(device, mode, hflip=False, vflip=False):
         mode_demo()
     elif mode == 'bars':
         mode_bars()
+    elif mode == 'graph':
+        mode_graph()
 
 
 if __name__ == "__main__":
