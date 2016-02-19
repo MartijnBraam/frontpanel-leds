@@ -13,12 +13,12 @@ def write_packet(packet):
 
 def write_frame(frame):
     if flip_horisontal:
-        frame = reversed(frame)
+        frame = frame[::-1]
     if flip_vertical:
         old_frame = frame
         frame = []
         for col in old_frame:
-            frame.append(list(reversed(col)))
+            frame.append(col[::-1])
     flat_frame = [item for sublist in frame for item in sublist]
     write_packet(flat_frame)
 
