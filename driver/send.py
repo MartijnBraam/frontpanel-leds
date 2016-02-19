@@ -3,9 +3,7 @@ import math
 from cobs import cobs
 from time import sleep
 import psutil
-
-ser = serial.Serial('/dev/ttyUSB0', 115200)
-sleep(1)
+import argparse
 
 
 def write_packet(packet):
@@ -14,12 +12,22 @@ def write_packet(packet):
 
 
 def write_frame(frame):
-    frame = reversed(frame)
+    if flip_horisontal:
+        frame = reversed(frame)
+    if flip_vertical:
+        old_frame = frame
+        frame = []
+        for col in old_frame:
+            frame.append(list(reversed(col)))
     flat_frame = [item for sublist in frame for item in sublist]
     write_packet(flat_frame)
 
 
-def render_bars(cpu, mem, netin, netout):
+def paint(frame):
+    pass
+
+
+def render_system_usage_bars(cpu, mem, netin, netout):
     frame = [
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
@@ -56,7 +64,7 @@ while False:
     mem = psutil.virtual_memory().percent / 100.0
     netin = 0.5
     netout = 0.5
-    frame = render_bars(cpu, mem, netin, netout)
+    frame = render_system_usage_bars(cpu, mem, netin, netout)
     write_frame(frame)
     sleep(0.3)
 
@@ -70,23 +78,7 @@ while False:
     sleep(1)
     write_packet([4])
 
-i = 0
-while True:
-    i += 30
-    sleep(0.1)
-    pos = math.sin(math.radians(i))
-    val = int((pos * 3) + 3)
-    if val == 6:
-        val = 5
-    row = [0] * 6
-
-    for j in range(val, 6):
-        row[j] = 10
-    row[val] = 1
-
-    write_packet(row)
-
-while True:
+while False:
     sleep(0.3)
 
     cpu = psutil.cpu_percent() / 100.0
@@ -104,3 +96,35 @@ while True:
     row[val] = 1
 
     write_packet(row)
+
+
+def main(device, hflip=False, vflip=False):
+    global ser, flip_horisontal, flip_vertical
+    ser = serial.Serial(device, 115200)
+    flip_horisontal = hflip
+    flip_vertical = vflip
+
+    i = 0
+    while True:
+        i += 30
+        sleep(0.1)
+        pos = math.sin(math.radians(i))
+        val = int((pos * 3) + 3)
+        if val == 6:
+            val = 5
+        row = [0] * 6
+
+        for j in range(val, 6):
+            row[j] = 10
+        row[val] = 1
+
+        write_packet(row)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Frontpanel led controller")
+    parser.add_argument('--hflip', help="Flip the display output on the horisontal axis", action="store_true")
+    parser.add_argument('--vflip', help="Flip the display output on the vertical axis", action="store_true")
+    parser.add_argument('device', help="Path to the serial port", default="/dev/frontpanel")
+    args = parser.parse_args()
+    main(args.device, args.hflip, args.vflip)
