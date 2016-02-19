@@ -29,8 +29,21 @@ def write_column(column):
     write_packet(column)
 
 
-def paint(frame):
-    pass
+def render_graph_point(value, min=0, max=100):
+    value = (value - min) / max
+    val = int((value * 6) + 0.5)
+    if val > 5:
+        val = 5
+
+    val = 5 - val
+
+    row = [0] * 6
+
+    for j in range(val, 6):
+        row[j] = 10
+    row[val] = 1
+
+    write_column(row)
 
 
 def render_system_usage_bars(cpu, mem, netin, netout):
@@ -94,25 +107,18 @@ def mode_demo():
         write_column(row)
 
 
-def mode_graph():
+def mode_graph_cpu():
     while True:
-        sleep(0.3)
+        sleep(0.5)
+        cpu = psutil.cpu_percent()
+        render_graph_point(cpu, 0, 100)
 
-        cpu = psutil.cpu_percent() / 100.0
 
-        val = int((cpu * 6) + 0.5)
-        if val > 5:
-            val = 5
-
-        val = 5 - val
-
-        row = [0] * 6
-
-        for j in range(val, 6):
-            row[j] = 10
-        row[val] = 1
-
-        write_column(row)
+def mode_graph_memory():
+    while True:
+        sleep(0.5)
+        mem = psutil.virtual_memory().percent
+        render_graph_point(mem, 0, 100)
 
 
 def main(device, mode, hflip=False, vflip=False):
@@ -125,8 +131,10 @@ def main(device, mode, hflip=False, vflip=False):
         mode_demo()
     elif mode == 'bars':
         mode_bars()
-    elif mode == 'graph':
-        mode_graph()
+    elif mode == 'graph-cpu':
+        mode_graph_cpu()
+    elif mode == 'graph-mem':
+        mode_graph_memory()
 
 
 if __name__ == "__main__":
@@ -134,6 +142,6 @@ if __name__ == "__main__":
     parser.add_argument('--hflip', help="Flip the display output on the horisontal axis", action="store_true")
     parser.add_argument('--vflip', help="Flip the display output on the vertical axis", action="store_true")
     parser.add_argument('device', help="Path to the serial port", default="/dev/frontpanel")
-    parser.add_argument('mode', help="Chooses what to display", choices=['bars', 'graph', 'demo'])
+    parser.add_argument('mode', help="Chooses what to display", choices=['bars', 'graph-cpu', 'graph-memory', 'demo'])
     args = parser.parse_args()
     main(args.device, args.mode, args.hflip, args.vflip)
