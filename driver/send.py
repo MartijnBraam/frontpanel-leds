@@ -60,25 +60,6 @@ def render_bar(frame, col, value):
 
 
 while False:
-    cpu = psutil.cpu_percent() / 100.0
-    mem = psutil.virtual_memory().percent / 100.0
-    netin = 0.5
-    netout = 0.5
-    frame = render_system_usage_bars(cpu, mem, netin, netout)
-    write_frame(frame)
-    sleep(0.3)
-
-while False:
-    sleep(1)
-    write_packet([1])
-    sleep(1)
-    write_packet([2])
-    sleep(1)
-    write_packet([3])
-    sleep(1)
-    write_packet([4])
-
-while False:
     sleep(0.3)
 
     cpu = psutil.cpu_percent() / 100.0
@@ -98,12 +79,18 @@ while False:
     write_packet(row)
 
 
-def main(device, hflip=False, vflip=False):
-    global ser, flip_horisontal, flip_vertical
-    ser = serial.Serial(device, 115200)
-    flip_horisontal = hflip
-    flip_vertical = vflip
+def mode_bars():
+    while True:
+        cpu = psutil.cpu_percent() / 100.0
+        mem = psutil.virtual_memory().percent / 100.0
+        netin = 0.5
+        netout = 0.5
+        frame = render_system_usage_bars(cpu, mem, netin, netout)
+        write_frame(frame)
+        sleep(0.3)
 
+
+def mode_demo():
     i = 0
     while True:
         i += 30
@@ -121,10 +108,23 @@ def main(device, hflip=False, vflip=False):
         write_packet(row)
 
 
+def main(device, mode, hflip=False, vflip=False):
+    global ser, flip_horisontal, flip_vertical
+    ser = serial.Serial(device, 115200)
+    flip_horisontal = hflip
+    flip_vertical = vflip
+
+    if mode == 'demo':
+        mode_demo()
+    elif mode == 'bars':
+        mode_bars()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Frontpanel led controller")
     parser.add_argument('--hflip', help="Flip the display output on the horisontal axis", action="store_true")
     parser.add_argument('--vflip', help="Flip the display output on the vertical axis", action="store_true")
     parser.add_argument('device', help="Path to the serial port", default="/dev/frontpanel")
+    parser.add_argument('mode', help="Chooses what to display", choices=['bars', 'graph', 'demo'])
     args = parser.parse_args()
-    main(args.device, args.hflip, args.vflip)
+    main(args.device, args.mode, args.hflip, args.vflip)
