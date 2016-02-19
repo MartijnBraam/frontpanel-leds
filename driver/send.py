@@ -23,6 +23,12 @@ def write_frame(frame):
     write_packet(flat_frame)
 
 
+def write_column(column):
+    if flip_vertical:
+        column = column[::-1]
+    write_packet(column)
+
+
 def paint(frame):
     pass
 
@@ -105,7 +111,7 @@ def mode_demo():
             row[j] = 10
         row[val] = 1
 
-        write_packet(row)
+        write_column(row)
 
 
 def main(device, mode, hflip=False, vflip=False):
