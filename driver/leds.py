@@ -11,6 +11,7 @@ netmax = 10 * 1024
 
 
 def write_packet(packet):
+    print(packet)
     data = cobs.encode(bytearray(packet))
     ser.write(data + b"\0")
 
@@ -129,27 +130,53 @@ def mode_graph_memory():
 
 def mode_clock():
     while True:
-        sleep(0.1)
         now = datetime.datetime.now()
         seconds = (now.second % 2) * 10
 
         hour5 = int(math.floor(now.hour / 5))
+        hour = now.hour % 5
 
         bar_hour5_1 = int(hour5 > 0)
         bar_hour5_2 = int(hour5 > 1)
         bar_hour5_3 = int(hour5 > 2)
         bar_hour5_4 = int(hour5 > 3)
 
+        bar_hour_1 = int(hour > 0)
+        bar_hour_2 = int(hour > 1)
+        bar_hour_3 = int(hour > 2)
+        bar_hour_4 = int(hour > 3)
+
+        minute5 = int(math.floor(now.minute / 5))
+        bar_min5_1 = int(minute5 > 0) * 10
+        bar_min5_2 = int(minute5 > 1) * 10
+        bar_min5_3 = int(minute5 > 2)
+        bar_min5_4 = int(minute5 > 3) * 10
+        bar_min5_5 = int(minute5 > 4) * 10
+        bar_min5_6 = int(minute5 > 5)
+        bar_min5_7 = int(minute5 > 6) * 10
+        bar_min5_8 = int(minute5 > 7) * 10
+        bar_min5_9 = int(minute5 > 8)
+        bar_min5_10 = int(minute5 > 9) * 10
+        bar_min5_11 = int(minute5 > 10) * 10
+
+        minute = now.minute % 5
+
+        bar_min_1 = int(minute > 0) * 10
+        bar_min_2 = int(minute > 1) * 10
+        bar_min_3 = int(minute > 2) * 10
+        bar_min_4 = int(minute > 3) * 10
+
         frame = [
             [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0],
-            [seconds, bar_hour5_4, 0, 0, 0],
-            [0, bar_hour5_3, 0, 0, 0, 0],
-            [0, bar_hour5_2, 0, 0, 0, 0],
-            [0, bar_hour5_1, 0, 0, 0, 0],
+            [0, 0, 0, bar_min5_6, 0, 0],
+            [0, 0, 0, bar_min5_5, bar_min5_11, 0],
+            [seconds, bar_hour5_4, bar_hour_4, bar_min5_4, bar_min5_10, bar_min_4],
+            [0, bar_hour5_3, bar_hour_3, bar_min5_3, bar_min5_9, bar_min_3],
+            [0, bar_hour5_2, bar_hour_2, bar_min5_2, bar_min5_8, bar_min_2],
+            [0, bar_hour5_1, bar_hour_1, bar_min5_1, bar_min5_7, bar_min_1],
         ]
         write_frame(frame)
+        sleep(1)
 
 
 def main(device, mode, hflip=False, vflip=False):
