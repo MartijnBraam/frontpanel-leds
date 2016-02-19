@@ -4,6 +4,7 @@ from cobs import cobs
 from time import sleep
 import psutil
 import argparse
+import datetime
 
 interval = 0.5
 netmax = 10 * 1024
@@ -126,6 +127,23 @@ def mode_graph_memory():
         render_graph_point(mem, 0, 100)
 
 
+def mode_clock():
+    while True:
+        sleep(1)
+        now = datetime.datetime.now()
+        seconds = now.second % 2
+        frame = [
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, seconds],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0],
+        ]
+        write_frame(frame)
+
+
 def main(device, mode, hflip=False, vflip=False):
     global ser, flip_horisontal, flip_vertical
     ser = serial.Serial(device, 115200)
@@ -140,6 +158,8 @@ def main(device, mode, hflip=False, vflip=False):
         mode_graph_cpu()
     elif mode == 'graph-memory':
         mode_graph_memory()
+    elif mode == 'clock':
+        mode_clock()
 
 
 if __name__ == "__main__":
@@ -151,7 +171,7 @@ if __name__ == "__main__":
                         help="The scaling for network usage. Defines the maximum value in KB/s (default 10 MB/s)",
                         default=10 * 1024, type=int)
     parser.add_argument('device', help="Path to the serial port", default="/dev/frontpanel")
-    parser.add_argument('mode', help="Chooses what to display", choices=['bars', 'graph-cpu', 'graph-memory', 'demo'])
+    parser.add_argument('mode', help="Chooses what to display", choices=['bars', 'graph-cpu', 'graph-memory', 'demo', 'clock'])
     args = parser.parse_args()
     interval = args.interval
     netmax = args.netmax
